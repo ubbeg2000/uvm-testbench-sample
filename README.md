@@ -1,0 +1,5 @@
+# UVM Testbench Sample: I2C Master and Slave Verification
+
+This project showcases my expertise in digital systems design and design verification through the development of two IP cores: an I2C master with a FIFO interface and a memory unit featuring an I2C slave interface. Both IPs are rigorously verified using the Universal Verification Methodology (UVM), ensuring a robust and scalable verification environment.
+
+A key highlight of this project is the testbench architecture, which leverages UVM to its fullest extent. It employs key UVM components such as sequences, agents, scoreboards, and functional coverage, promoting modularity and reusability. The testbench is designed to be adaptable, enabling seamless integration with future projects and facilitating efficient verification of similar protocols. This structured approach demonstrates best practices in UVM-based verification while reinforcing the importance of reusable and scalable verification methodologies.
