@@ -9,28 +9,76 @@ A key highlight of this project is the testbench architecture, which leverages U
 ### I2C Master
 
 The I2C Master IP is essentially a couple of FIFO buffers (write and read FIFO) that are attached to an I2C master interface. Data that will be written via I2C comes from a write FIFO while data that are read from the I2C interface will be stored into the read FIFO. This IP is intended to be used in conjuction with vendor specific IO buffers. The block diagram of the IP is shown in the figure below. features of the IP are:
-1. 7-bit I2C slave addressing
-2. Burst I2C write, will send I2C packets until write FIFO is empty
-3. Burst I2C read, number of data to be read is configurable via the command value
-4. Burst I2C read with address, number of data to be read and the starting address is configurable via the command value
+1. Implements 7-bit I2C slave addressing
+2. Read and write FIFO depth up to 256
+3. Burst I2C write, will send I2C packets until write FIFO is empty
+4. Burst I2C read, number of data to be read is configurable via the command value
+5. Burst I2C read with address, number of data to be read and the starting address is configurable via the command value
 
-![i2c master block diagram](https://github.com/ubbeg2000/uvm-testbench-sample/blob/main/images/i2c_master_block.png?raw=true)
+![i2c master block diagram](https://github.com/ubbeg2000/uvm-testbench-sample/blob/chore/project-outline/images/i2c_master_block.png?raw=true)
 
 | Port Name  | Direction | Dimension | Description                                   |
 |------------|-----------|-----------|-----------------------------------------------|
 | `command`  | `input`   | 32-bit    | Command to send or receive via the I2C intf.  |
 | `status`   | `output`  | 32-bit    | Status of the I2C transaction and the IP      |
+| `i2c_send` | `input`   | 1-bit     | Set to high on rising edge to execute command |
 | `r_data`   | `output`  | 7-bit     | Read output from read FIFO                    |
 | `w_data`   | `input`   | 7-bit     | Write input for write FIFO                    |
 | `r_en`     | `input`   | 1-bit     | Enables reading from read FIFO                |
 | `w_en`     | `input`   | 1-bit     | Enables writing to write FIFO                 |
 | `clk`      | `input`   | 1-bit     | IP clock signal, **must be 2x I2C frequency** |
-| `rstn`     | `input`   | 1-bit     | Synchronous reset                             |
+| `rstn`     | `input`   | 1-bit     | Active low synchronous reset                  |
 | `sda_i`    | `input`   | 1-bit     | Receiving port for incoming SDA signal        |
 | `sda_o`    | `output`  | 1-bit     | Driving port for outgoing SDA signal          |
 | `scl_o`    | `output`  | 1-bit     | Driving port for SCL                          |
 | `sda_o_en` | `output`  | 1-bit     | Enables driving to output buffer circuit      |
 
+The format for the `command` and `status` signal is as shown below
+
+```
+Command
+
+MSB                                                                     LSB
+<------------------------------ 32 bits ---------------------------------->
+| slave addr. | data addr. | data addr. en | i2c read/write | data length |
+<-- 7 bits --> <- 8 bits -> <--- 1 bit ---> <--- 1 bit ----> <- 15 bits -->
+```
+
+| Field            | Description                                             |
+|------------------|---------------------------------------------------------|
+| `slave addr.`    | I2C slave address to communicate with                   |
+| `data addr.`     | Data address for single/burst read with data address    |
+| `data addr. en`  | Set high to do single/burst read with data address      |
+| `i2c read/write` | Set to logic high for reading and logic low for writing |
+| `data length `   | Length of data to read                                  |
+
+The command signal will be sampled on a clock rising edge if the `i2c_send` signal is high. It will then be stored on an internal register until IP has finished executing the command.
+
+```
+Status
+
+MSB                                                                      LSB
+<------------------------------ 32 bits ----------------------------------->
+| busy | failure | r fifo  | r fifo  | w.fifo  | w fifo  | r fifo | w fifo |
+|      | code    | full    | empty   | full    | empty   | count  | count  |
+<- 1 -> <- 11 --> <-- 1 --> <-- 1 --> <-- 1 --> <-- 1 --> <-- 8 -> <-- 8 -->
+```
+
+| Field          | Description                                            |
+|----------------|--------------------------------------------------------|
+| `busy`         | Shall be high during the duration of command execution |
+| `failure code` | 11-bit code, valid until next command execution        |
+| `r fifo full`  | Shall be high if read FIFO is full                     |
+| `r fifo empty` | Shall be high if read FIFO is empty                    |
+| `w fifo full`  | Shall be high if write FIFO is full                    |
+| `w fifo empty` | Shall be high if write FIFO is empty                   |
+| `r fifo count` | Number of data stored in read FIFO                     |
+| `w fifo count` | Number of data stored in write FIFO                    |
+
+The `status` signal will be updated on every rising edge of the clock. Error codes that are currently defined are:
+1. **0x001**: No slave acknowledgement after addressing
+2. **0x002**: Missing slave acknowledgement after writing read address
+3. **0x003**: Missing slave acknowledgement after writing data
 
 ## I2C Slave
 
@@ -40,42 +88,50 @@ The I2C Slave IP is a 256-bytes memory element that is attached to an I2C slave 
 3. Single/burst read with memory address, reading will start from the specified memory address
 4. Configurable slave address with parameterized default slave address value, done by writing to memory address 0x00
 
-![i2c slave block diagram](https://github.com/ubbeg2000/uvm-testbench-sample/blob/main/images/i2c_slave_block.png)
+![i2c slave block diagram](https://github.com/ubbeg2000/uvm-testbench-sample/blob/chore/project-outline/images/i2c_slave_block.png?raw=true)
 
-| Port Name  | Direction | Dimension | Description                                   |
-|------------|-----------|-----------|-----------------------------------------------|
-| `addr`     | `output`  | 7-bit     | Read output from read FIFO                    |
-| `data_o`   | `input`   | 7-bit     | Write input for write FIFO                    |
-| `data_i`   | `input`   | 1-bit     | Enables reading from read FIFO                |
-| `rw_en`    | `input`   | 32-bit    | Command to send or receive via the I2C intf.  |
-| `rw`       | `output`  | 32-bit    | Status of the I2C transaction and the IP      |
-| `status`   | `input`   | 1-bit     | Enables writing to write FIFO                 |
-| `clk`      | `output`  | 1-bit     | Driving port for outgoing SDA signal          |
-| `rstn`     | `output`  | 1-bit     | Driving port for SCL                          |
-| `sda_o`    | `input`   | 1-bit     | IP clock signal, **must be 2x I2C frequency** |
-| `sda_i`    | `input`   | 1-bit     | Synchronous reset                             |
-| `scl_i`    | `input`   | 1-bit     | Receiving port for incoming SDA signal        |
-| `sda_o_en` | `output`  | 1-bit     | Enables driving to output buffer circuit      |
+| Port Name  | Direction | Dimension | Description                                    |
+|------------|-----------|-----------|------------------------------------------------|
+| `addr`     | `input`   | 8-bit     | Memory address to read from or write to        |
+| `data_o`   | `output`  | 8-bit     | Result of memory read                          |
+| `data_i`   | `input`   | 8-bit     | Data to write to memory                        |
+| `rw_en`    | `input`   | 1-bit     | Enable signal for memory interface             |
+| `rw`       | `input`   | 1-bit     | Logic high for reading, low for writing        |
+| `busy`     | `output`  | 1-bit     | Will be high if during I2C operation           |
+| `clk`      | `input`   | 1-bit     | Driving port for outgoing SDA signal           |
+| `rstn`     | `input`   | 1-bit     | Driving port for SCL                           |
+| `clk`      | `input`   | 1-bit     | IP clock signal, **at least 2x I2C frequency** |
+| `rstn`     | `input`   | 1-bit     | Active low synchronous reset                   |
+| `scl_i`    | `input`   | 1-bit     | Receiving port for incoming SDA signal         |
+| `sda_o_en` | `output`  | 1-bit     | Enables driving to output buffer circuit       |
 
-## Testbench Architecture
+## About the Testbenches
+
+### Architecture
 
 Verification of the aforementioned IPs are done using UVM to have reusability and better scalability of writing tests. There are three testbenches in total: one for the master, one for the slave, and one for integration test between the master and the slave. All three of those testbenches follow the dual top architecture described in Siemen's UVM Cookbook.
 
 ### Universial Verification Components
 
-## Verification Runs
+#### MFIFO UVC
 
-### I2C Master Block Test
+#### I2C UVC
 
-### I2C Slave Block Test
+#### MEM UVC
 
-### Integration Test
+### Evaluation, Functional Coverage, and Metric Analysis
+
+### Test Content
 
 ## Prototype on FPGA
 
 ### LCD Monitor Driver
 
+WIP
+
 ### I2C Slave Communications with Microcontroller
+
+WIP
 
 ## Appendix
 
