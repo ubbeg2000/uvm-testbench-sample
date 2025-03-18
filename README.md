@@ -15,7 +15,7 @@ The I2C Master IP is essentially a couple of FIFO buffers (write and read FIFO) 
 4. Burst I2C read, number of data to be read is configurable via the command value
 5. Burst I2C read with address, number of data to be read and the starting address is configurable via the command value
 
-![i2c master block diagram](https://github.com/ubbeg2000/uvm-testbench-sample/blob/chore/project-outline/images/i2c_master_block.png?raw=true)
+<img src="https://github.com/ubbeg2000/uvm-testbench-sample/blob/chore/project-outline/images/i2c_master_block.png?raw=true" alt="i2c master block diagram" width="400"/>
 
 | Port Name  | Direction | Dimension | Description                                   |
 |------------|-----------|-----------|-----------------------------------------------|
@@ -88,7 +88,7 @@ The I2C Slave IP is a 256-bytes memory element that is attached to an I2C slave 
 3. Single/burst read with memory address, reading will start from the specified memory address
 4. Configurable slave address with parameterized default slave address value, done by writing to memory address 0x00
 
-![i2c slave block diagram](https://github.com/ubbeg2000/uvm-testbench-sample/blob/chore/project-outline/images/i2c_slave_block.png?raw=true)
+<img src="https://github.com/ubbeg2000/uvm-testbench-sample/blob/chore/project-outline/images/i2c_slave_block.png?raw=true" alt="i2c master block diagram" width="400"/>
 
 | Port Name  | Direction | Dimension | Description                                    |
 |------------|-----------|-----------|------------------------------------------------|
