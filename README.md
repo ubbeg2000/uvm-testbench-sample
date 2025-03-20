@@ -109,19 +109,47 @@ The I2C Slave IP is a 256-bytes memory element that is attached to an I2C slave 
 
 ### Architecture
 
-Verification of the aforementioned IPs are done using UVM to have reusability and better scalability of writing tests. There are three testbenches in total: one for the master, one for the slave, and one for integration test between the master and the slave. All three of those testbenches follow the dual top architecture described in Siemen's UVM Cookbook.
+Verification of the aforementioned IPs are done using UVM to have reusability and better scalability of writing tests. There are three testbenches in total: one for the master, one for the slave, and one for integration test between the master and the slave. All three of those testbenches follow the dual top architecture described in Siemen's UVM Cookbook. An illustration of the testbench architecture is as shown below.
+
+<img src="https://github.com/ubbeg2000/uvm-testbench-sample/blob/chore/project-outline/images/dual_top_tb_arch.png?raw=true" alt="i2c master block diagram" width="400"/>
 
 ### Universial Verification Components
 
-#### MFIFO UVC
+One of the point of UVM is reusability, this can be observed from the use of Universal Verification Components (UVC) which abstracts away low-level stimulus driving and signal analysis to a higher level of transaction. This project includes three UVC in the form of UVM agents, one for each interface available in the project. There is the `mfifo_agent` for the master's FIFO interface, `mem_agent` for the slave's memory interface, and `i2c_agent` for the I2C interface.
 
-#### I2C UVC
+All of the aforementioned UVCs are configurable to be either an active or passive agent and configurable to log observed sequence item. The `i2c_agent` is a bit different in that it has two modes, a master driver mode and a slave responder mode. The master driver mode is used to generate I2C master signal stimulus while the slave responder mode is used to responed to I2C master signals.
 
-#### MEM UVC
+### Register Abstraction Layer
+
+To make life easier, two Register Abstraction Layers (RALs) are included for the I2C master and slave IP. For the 
 
 ### Evaluation, Functional Coverage, and Metric Analysis
 
+The DUT's compliance to specification is measured in three categories: feature correctness, functional coverage, and metric fit. Those three aspects are measured by evaluation with the scoreboard, functional coverage via collectors, and metric analysis. All of those analysis components are made to be test specific.
+
 ### Test Content
+
+Test content in this context means the sequences that generates stimulus for the Design Under Test (DUT). They are made in a way that covers all of the features mentioned in the IP's description as well as compliance to the interfaces specification. Test content that are included in this project are as shown in the table below.
+
+1. Implements 7-bit I2C slave addressing
+2. Read and write FIFO depth up to 256
+3. Burst I2C write, will send I2C packets until write FIFO is empty
+4. Burst I2C read, number of data to be read is configurable via the command value
+5. Burst I2C read with address, number of data to be read and the starting address is configurable via the command value
+
+| Test Name               | Covered Feature(s)   | Description |
+|-------------------------|----------------------|-------------|
+| `master_write_test`     | * Single/burst write |             |
+|                         | * 7-bit addressing   |             |
+| `master_read_test`      |
+| `master_read_addr_test` | 
+| `combined_test`         |
+| `slave_write_test`      |
+| `slave_read_test`       |
+| `slave_read_addr_test`  |
+| `slave_addr_test`       |
+| `slave_combined_test`   |
+| `integration_rw_test`   |
 
 ## Prototype on FPGA
 
