@@ -30,18 +30,15 @@ One Register Abstraction Layers (RALs) is included for the I2C master IP. It is 
 
 ## Evaluation
 
-### I2C Master Evaluation
+The general flow of how the scoreboard evaluate functional correctness is as shown on the flow below.
 
-Functional correctness of the I2C master is evaluated based on the correctness of:
-1. I2C data packtes sent out of the IP
-2. The data inside the read FIFO after a read operation
-3. The sequence of I2C control packets sent out of the IP (start, address, repeated, and stop packets)
+<img src="https://github.com/ubbeg2000/uvm-testbench-sample/blob/chore/project-outline/images/evaluation_flow.png?raw=true" alt="eval_flow" width="600"/>
 
-### I2C Slave Evaluation
-
-Functional correctness of the I2C slave memory is evaludated by comparing the actual state of the memory to the expected state of the memory. The expected state of memory is deducted based on the incoming memory and or I2C transactions that occurs prior the the evaluation call of the test.
+As described by the flowchart, the scoreboard will make predictions and do evaluations purely based on captured sequence items. Evaluation is done on by comparing the actual observed output to the predicted output which is inferred from the input sequences that the scoreboard receives from its monitors. With that design, the prediction model will be IP specific, hence why there is a seperate scoreboard for the I2C master and the I2C slave.
 
 ## Functional Coverage
+
+Functional coverage are calculated by sampling incoming sequence items every time the monitor sends it and is reported after the a test has ended. This metric is used to determine wether or not more cycles and or randomizations are needed. The following sections specifies points of interests for every coverage collectors in this project's testbenches.
 
 ### MFIFO Coverage
 

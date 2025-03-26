@@ -41,7 +41,7 @@ The DUT's compliance to specification is measured in three categories: functiona
 
 Further details can be found on TESTBENCH.md
 
-### Test Content
+## Test Content
 
 Test content in this context means the sequences that generates stimulus for the Design Under Test (DUT). They are made in a way that covers all of the features mentioned in the IP's description as well as compliance to the interfaces specification. Test content that are included in this project are as listed below.
 1. `master_write_test`
