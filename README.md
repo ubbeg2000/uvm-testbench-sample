@@ -4,6 +4,24 @@ This project showcases my expertise in digital systems design and design verific
 
 A key highlight of this project is the testbench architecture, which leverages UVM to its fullest extent. It employs key UVM components such as sequences, agents, scoreboards, and functional coverage, promoting modularity and reusability. The testbench is designed to be adaptable, enabling seamless integration with future projects and facilitating efficient verification of similar protocols. This structured approach demonstrates best practices in UVM-based verification while reinforcing the importance of reusable and scalable verification methodologies.
 
+## Table of Contents
+- [UVM Testbench Sample: I2C Master and Slave Verification](#uvm-testbench-sample-i2c-master-and-slave-verification)
+  - [Table of Contents](#table-of-contents)
+  - [About the IPs](#about-the-ips)
+    - [I2C Master](#i2c-master)
+    - [I2C Slave](#i2c-slave)
+  - [Testbench Architecture](#testbench-architecture)
+  - [Test Content](#test-content)
+  - [Prototype on FPGA](#prototype-on-fpga)
+    - [Driving an OLED Monitor](#driving-an-oled-monitor)
+    - [I2C Slave Communications with Microcontroller](#i2c-slave-communications-with-microcontroller)
+  - [Appendix](#appendix)
+    - [Source Code Structure](#source-code-structure)
+    - [Trying it Yourself](#trying-it-yourself)
+    - [Links and References](#links-and-references)
+
+
+
 ## About the IPs
 
 ### I2C Master
@@ -18,7 +36,7 @@ The I2C Master IP is essentially a couple of FIFO buffers (write and read FIFO) 
 5. Burst I2C read, number of data to be read is configurable via the command value
 6. Burst I2C read with address, number of data to be read and the starting address is configurable via the command value
 
-## I2C Slave
+### I2C Slave
 
 <img src="https://github.com/ubbeg2000/uvm-testbench-sample/blob/chore/project-outline/images/i2c_slave_block.png?raw=true" alt="i2c master block diagram" width="400"/>
 
