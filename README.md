@@ -101,7 +101,6 @@ project/
 │   └── i2c_mem.sv                 # RTL for the I2C Slave IP
 │
 └── testbench/
-    ├── testbench.sv               # Top of the top
     ├── testbench_master.sv        # Top level component for I2C Master block test
     ├── testbench_slave.sv         # Top level component for I2C Slave block test
     ├── testbench_integration.sv   # Top level component for integration test
@@ -123,15 +122,36 @@ project/
 
 ### Trying it Yourself
 
-You can find the project on EDA Playground whose link is included in the Appendix section. The `testbench.sv` file is the entrypoint for all simulations, which simulation to run is determined by which testbench file is imported in the `testbench.sv` file. Contents of the file looks something like this.
+You can find the project on EDA Playground whose link is included in the Appendix section. To run the simulation, you'll need to select which testbench to use and which test to run. This is done by editing the the `run.bash` which looks like this.
 
-```SystemVerilog
-// `include "testbench_master.sv"
-// `include "testbench_slave.sv"
-`include "testbench_integration.sv"
+```bash
+# change these values to select which testbench to use and test to run
+export TESTBENCH=testbench_master.sv
+export TESTNAME=master_combined_test
+
+vlib work
+vlog \
+  +incdir+$RIVIERA_HOME/vlib/uvm-1.2/src \
+  -l uvm_1_2 \
+  -err VCP2947 W9 \
+  -err VCP2974 W9 \
+  -err VCP3003 W9 \
+  -err VCP5417 W9 \
+  -err VCP6120 W9 \
+  -err VCP7862 W9 \
+  -err VCP2129 W9 \
+  -timescale 1ns/1ns \
+  -pli /home/runner/tb.so \
+  $TESTBENCH
+
+vsim \
+  +access+r +TESTNAME=$TESTNAME \
+  +w_nets -interceptcoutput \
+  -c -pli /home/runner/tb.so 
+  -do "run -all; exit"
 ```
 
-If say you want to run tests for the I2C Master IP, simply comment all the other includes and uncomment the `testbench_master.sv` include. The simulation can be ran with the Aldec Riviera Pro 2024.04 simulator with UVM 1.2 included in the project.
+If say you want to run tests for the I2C Master IP, simply set the TESTBENCH variable to `testbench_master.sv` and set the TESTNAME variable to `master_combined_test`. You can check the Open EPWave after run option if you want to see the waveform. The simulation is ran with the Aldec Riviera Pro 2024.04 simulator with UVM 1.2 included in the project.
 
 ### Links and References
 - Demo on EDA Playground: [https://edaplayground.com/x/QBm9](https://edaplayground.com/x/QBm9)
