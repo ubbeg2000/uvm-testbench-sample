@@ -49,7 +49,7 @@ The I2C Slave IP is a 256-bytes memory element that is attached to an I2C slave 
 4. Single/burst read with memory address, reading will start from the specified memory address
 5. Configurable slave address with parameterized default slave address value, done by writing to memory address 0x00
 
-Further details on the IPs can be found on DESIGNS.md
+Further details on the IPs can be found on [`DESIGNS.md`](https://github.com/ubbeg2000/uvm-testbench-sample/blob/main/DESIGNS.md)
 
 ## Testbench Architecture
 
@@ -59,7 +59,7 @@ Verification of the aforementioned IPs are done using UVM to have reusability an
 
 The DUT's compliance to specification is measured in three categories: functional correctness, functional coverage, and metric fit. Those three aspects are measured by evaluation with the scoreboard, functional coverage via collectors, and metric analysis. In this sample project, scoreboards are made to be test environment specific while coverage collectors are made for each kind of sequence item that are used by the UVCs. Metric analyzers are not implemented in this testbench.
 
-Further details can be found on TESTBENCH.md
+Further details can be found on [`TESTBENCH.md`](https://github.com/ubbeg2000/uvm-testbench-sample/blob/main/TESTBENCH.md)
 
 ## Test Content
 
@@ -75,7 +75,7 @@ Test content in this context means the sequences that generates stimulus for the
 9. `slave_combined_test`
 10. `integration_rw_test`
 
-Details on each testcase will be made available on TESTCONTENT.md.
+Details on each testcase will be made available on [`TESTCONTENT.md`](https://github.com/ubbeg2000/uvm-testbench-sample/blob/main/TESTCONTENT.md)
 
 ## Prototype on FPGA
 
